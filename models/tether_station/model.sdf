@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="tether_station" canonical_link="base_link">
+    <link name="base_link">
+      <inertial>
+        <mass>12</mass>
+        <inertia><ixx>0.22</ixx><iyy>0.27</iyy><izz>0.39</izz></inertia>
+      </inertial>
+      <collision name="footprint">
+        <pose>0 0 0.045 0 0 0</pose>
+        <geometry><box><size>0.46 0.40 0.09</size></box></geometry>
+      </collision>
+      <visual name="base_cover">
+        <pose>0 0 0.045 0 0 0</pose>
+        <geometry><box><size>0.46 0.40 0.09</size></box></geometry>
+        <material><diffuse>0.14 0.19 0.25 1</diffuse></material>
+      </visual>
+      <visual name="left_support">
+        <pose>0 0.153 0.16 0 0 0</pose>
+        <geometry><box><size>0.14 0.042 0.22</size></box></geometry>
+        <material><diffuse>0.91 0.52 0.12 1</diffuse></material>
+      </visual>
+      <visual name="right_support">
+        <pose>0 -0.153 0.16 0 0 0</pose>
+        <geometry><box><size>0.14 0.042 0.22</size></box></geometry>
+        <material><diffuse>0.91 0.52 0.12 1</diffuse></material>
+      </visual>
+      <visual name="fairlead">
+        <pose>0 0 0.303 0 0 0</pose>
+        <geometry><box><size>0.08 0.31 0.034</size></box></geometry>
+        <material><diffuse>0.32 0.40 0.47 1</diffuse></material>
+      </visual>
+    </link>
+    <link name="drum">
+      <pose>0 0 0.187 0 0 0</pose>
+      <inertial>
+        <mass>0.7</mass>
+        <inertia><ixx>0.006</ixx><iyy>0.003</iyy><izz>0.006</izz></inertia>
+      </inertial>
+      <visual name="wound_cable">
+        <pose>0 0 0 1.57079632679 0 0</pose>
+        <geometry><cylinder><radius>0.08</radius><length>0.23</length></cylinder></geometry>
+        <material><diffuse>0.16 0.29 0.37 1</diffuse></material>
+      </visual>
+      <visual name="left_flange">
+        <pose>0 0.123 0 1.57079632679 0 0</pose>
+        <geometry><cylinder><radius>0.105</radius><length>0.016</length></cylinder></geometry>
+        <material><diffuse>0.42 0.49 0.53 1</diffuse></material>
+      </visual>
+      <visual name="right_flange">
+        <pose>0 -0.123 0 1.57079632679 0 0</pose>
+        <geometry><cylinder><radius>0.105</radius><length>0.016</length></cylinder></geometry>
+        <material><diffuse>0.42 0.49 0.53 1</diffuse></material>
+      </visual>
+      <visual name="rotation_index">
+        <pose>0 0 0.078 0 0 0</pose>
+        <geometry><box><size>0.018 0.23 0.008</size></box></geometry>
+        <material><diffuse>0.92 0.57 0.18 1</diffuse></material>
+      </visual>
+    </link>
+    <joint name="anchor_joint" type="fixed">
+      <parent>world</parent><child>base_link</child>
+    </joint>
+    <joint name="drum_joint" type="revolute">
+      <parent>base_link</parent><child>drum</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <!-- Travel limits are enforced in metres by the winch controller. -->
+        <limit><lower>-1e16</lower><upper>1e16</upper></limit>
+      </axis>
+    </joint>
+  </model>
+</sdf>
