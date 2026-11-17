@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="quad_x" canonical_link="base_link">
+    <!-- Scale 0.644422: 0.741 m average motor diagonal, 1.5 times Iris. -->
+    <pose>0 0 0.1288844256 0 0 0</pose>
+    <link name="base_link">
+      <inertial>
+        <mass>0.3612809834</mass>
+        <inertia>
+          <ixx>0.004223143316</ixx><iyy>0.004889955419</iyy><izz>0.008224015932</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <visual name="airframe">
+        <geometry><mesh><scale>0.6444221279 0.6444221279 0.6444221279</scale><uri>meshes/airframe.dae</uri></mesh></geometry>
+      </visual>
+      <collision name="hull">
+        <pose>0 0 0.0161105532 0 0 0</pose>
+        <geometry><box><size>0.2964341788 0.1804381958 0.1224402043</size></box></geometry>
+      </collision>
+      <collision name="left_skid">
+        <pose>0 0.09730774132 -0.11 0 0 0</pose>
+        <geometry><box><size>0.322211064 0.02706572937 0.01739939745</size></box></geometry>
+      </collision>
+      <collision name="right_skid">
+        <pose>0 -0.09730774132 -0.11 0 0 0</pose>
+        <geometry><box><size>0.322211064 0.02706572937 0.01739939745</size></box></geometry>
+      </collision>
+      <collision name="motor_0">
+        <pose>0.2835457363 0.2384361873 0.01933266384 0 0 0</pose>
+        <geometry><cylinder><radius>0.0483316596</radius><length>0.07475296684</length></cylinder></geometry>
+      </collision>
+      <collision name="motor_1">
+        <pose>0.2835457363 -0.2384361873 0.01933266384 0 0 0</pose>
+        <geometry><cylinder><radius>0.0483316596</radius><length>0.07475296684</length></cylinder></geometry>
+      </collision>
+      <collision name="motor_2">
+        <pose>-0.2835457363 -0.2384361873 0.01933266384 0 0 0</pose>
+        <geometry><cylinder><radius>0.0483316596</radius><length>0.07475296684</length></cylinder></geometry>
+      </collision>
+      <collision name="motor_3">
+        <pose>-0.2835457363 0.2384361873 0.01933266384 0 0 0</pose>
+        <geometry><cylinder><radius>0.0483316596</radius><length>0.07475296684</length></cylinder></geometry>
+      </collision>
+      <sensor name="air_pressure" type="air_pressure">
+        <always_on>true</always_on>
+        <update_rate>20</update_rate>
+      </sensor>
+      <sensor name="magnetometer" type="magnetometer">
+        <always_on>true</always_on>
+        <update_rate>20</update_rate>
+      </sensor>
+      <sensor name="navsat" type="navsat">
+        <always_on>true</always_on>
+        <update_rate>5</update_rate>
+      </sensor>
+      <visual name="gimbal_mount">
+        <pose>0.1907489499 0 0.02384361873 0 0 0</pose>
+        <geometry><box><size>0.100529852 0.0393097498 0.01675497533</size></box></geometry>
+        <material>
+          <ambient>0.14 0.18 0.23 1</ambient>
+          <diffuse>0.20 0.25 0.30 1</diffuse>
+        </material>
+      </visual>
+      <visual name="rear_depth_housing">
+        <pose>-0.1727051303 0 -0.04124301619 0 0 0</pose>
+        <geometry><box><size>0.03479879491 0.05799799151 0.0161105532</size></box></geometry>
+        <material>
+          <ambient>0.14 0.18 0.23 1</ambient>
+          <diffuse>0.20 0.25 0.30 1</diffuse>
+        </material>
+      </visual>
+      <sensor name="rear_depth" type="depth_camera">
+        <pose degrees="true">-0.1727051303 0 -0.05026492598 0 90 0</pose>
+        <topic>/quad_x/rear_depth</topic>
+        <gz_frame_id>rear_depth</gz_frame_id>
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <camera>
+          <horizontal_fov>1.51843645</horizontal_fov>
+          <camera_info_topic>/quad_x/rear_depth/camera_info</camera_info_topic>
+          <image>
+            <width>848</width>
+            <height>480</height>
+            <format>R_FLOAT32</format>
+          </image>
+          <clip><near>0.17</near><far>10.0</far></clip>
+          <depth_camera>
+            <clip><near>0.17</near><far>10.0</far></clip>
+          </depth_camera>
+        </camera>
+      </sensor>
+    </link>
+    <!-- Iris motor order, with the original Quad X hub locations. -->
+    <link name='imu_link'>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.04014233149</mass>
+        <inertia>
+          <ixx>1.111353504e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.222707009e-06</iyy>
+          <iyz>0</iyz>
+          <izz>2.222707009e-06</izz>
+        </inertia>
+      </inertial>
+      <sensor name="imu_sensor" type="imu">
+        <gz_frame_id>imu_link</gz_frame_id>
+        <pose degrees="true">0 0 0 180 0 0</pose>
+        <always_on>1</always_on>
+        <update_rate>1000.0</update_rate>
+      </sensor>
+    </link>
+    <joint name='imu_joint' type='revolute'>
+      <child>imu_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <damping>1.0</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rotor_0'>
+      <pose>0.2835457363 -0.2384361873 0.06573105705 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.006690388582</mass>
+        <inertia>
+          <ixx>1.083569667e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.852670746e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.862672927e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.00322211064</length>
+            <radius>0.06444221279</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1.417728681 1.417728681 1.417728681</scale>
+            <uri>meshes/iris_prop_ccw.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.12 0.12 0.12 1</ambient>
+          <diffuse>0.18 0.18 0.18 1</diffuse>
+          <specular>0.04 0.04 0.04 1</specular>
+          <pbr>
+            <metal>
+              <metalness>0.0</metalness>
+              <roughness>0.88</roughness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name='rotor_0_joint' type='revolute'>
+      <child>rotor_0</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0.0006419773823</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rotor_1'>
+      <pose>-0.2835457363 0.2384361873 0.06573105705 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.006690388582</mass>
+        <inertia>
+          <ixx>1.083569667e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.852670746e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.862672927e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.00322211064</length>
+            <radius>0.06444221279</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1.417728681 1.417728681 1.417728681</scale>
+            <uri>meshes/iris_prop_ccw.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.12 0.12 0.12 1</ambient>
+          <diffuse>0.18 0.18 0.18 1</diffuse>
+          <specular>0.04 0.04 0.04 1</specular>
+          <pbr>
+            <metal>
+              <metalness>0.0</metalness>
+              <roughness>0.88</roughness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name='rotor_1_joint' type='revolute'>
+      <child>rotor_1</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0.0006419773823</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rotor_2'>
+      <pose>0.2835457363 0.2384361873 0.06573105705 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.006690388582</mass>
+        <inertia>
+          <ixx>1.083569667e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.852670746e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.862672927e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.00322211064</length>
+            <radius>0.06444221279</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1.417728681 1.417728681 1.417728681</scale>
+            <uri>meshes/iris_prop_cw.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.12 0.12 0.12 1</ambient>
+          <diffuse>0.18 0.18 0.18 1</diffuse>
+          <specular>0.04 0.04 0.04 1</specular>
+          <pbr>
+            <metal>
+              <metalness>0.0</metalness>
+              <roughness>0.88</roughness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name='rotor_2_joint' type='revolute'>
+      <child>rotor_2</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0.0006419773823</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rotor_3'>
+      <pose>-0.2835457363 -0.2384361873 0.06573105705 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.006690388582</mass>
+        <inertia>
+          <ixx>1.083569667e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.852670746e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.862672927e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <length>0.00322211064</length>
+            <radius>0.06444221279</radius>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name='visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1.417728681 1.417728681 1.417728681</scale>
+            <uri>meshes/iris_prop_cw.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.12 0.12 0.12 1</ambient>
+          <diffuse>0.18 0.18 0.18 1</diffuse>
+          <specular>0.04 0.04 0.04 1</specular>
+          <pbr>
+            <metal>
+              <metalness>0.0</metalness>
+              <roughness>0.88</roughness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name='rotor_3_joint' type='revolute'>
+      <child>rotor_3</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <damping>0.0006419773823</damping>
+        </dynamics>
+      </axis>
+    </joint>
+  </model>
+</sdf>

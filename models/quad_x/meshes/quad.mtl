@@ -1,0 +1,33 @@
+newmtl graphite
+Kd 0.16 0.22 0.29
+
+newmtl frame
+Kd 0.32 0.43 0.51
+
+newmtl shell
+Kd 0.98 0.49 0.13
+
+newmtl panel
+Kd 0.76 0.27 0.065
+
+newmtl steel
+Kd 0.56 0.66 0.72
+
+newmtl rubber
+Kd 0.1 0.15 0.2
+
+newmtl glass
+Kd 0.18 0.57 0.7
+
+newmtl forward_led
+Kd 0.31 1 0.87
+
+newmtl rear_led
+Kd 1 0.28 0.22
+
+newmtl blade
+Kd 0.3 0.38 0.46
+
+newmtl tip
+Kd 0.96 0.86 0.69
+
