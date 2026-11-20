@@ -81,15 +81,18 @@
       <anchor_offset>0 0 0.32</anchor_offset>
       <vehicle_offset>-0.08 0 -0.06</vehicle_offset>
       <drum_radius>0.08</drum_radius>
-      <initial_length>3.1</initial_length>
+      <initial_length>3.0</initial_length>
       <min_length>1.0</min_length>
       <max_length>500.0</max_length>
-      <max_payout_speed>1.0</max_payout_speed>
+      <max_payout_speed>2.0</max_payout_speed>
       <!-- Drum brake settings. Cable damping below acts on tether stretch. -->
       <breakaway_tension>0.0025</breakaway_tension>
-      <brake_damping>0.0025</brake_damping>
-      <stiffness>0.1</stiffness>
-      <damping>0.04</damping>
+      <brake_damping>0.00098</brake_damping>
+      <!-- Gentle automatic take-up above initial_length, in N and m/s. -->
+      <takeup_tension>0.25</takeup_tension>
+      <max_retract_speed>2.0</max_retract_speed>
+      <stiffness>10.0</stiffness>
+      <damping>1.0</damping>
       <max_tension>15.0</max_tension>
     </plugin>
   </world>

@@ -59,15 +59,20 @@ class TetherPlugin final : public System, public ISystemConfigure,
     this->maxTension = sdf->Get<double>("max_tension", 15.0).first;
     this->breakawayTension = sdf->Get<double>("breakaway_tension", 3.0).first;
     this->brakeDamping = sdf->Get<double>("brake_damping", 0.04).first;
-    const std::array<double, 10> parameters{this->radius, this->initialLength,
+    this->takeupTension = sdf->Get<double>("takeup_tension", 0.0).first;
+    this->maxRetractSpeed = sdf->Get<double>("max_retract_speed", 0.2).first;
+    const std::array<double, 12> parameters{this->radius, this->initialLength,
         this->minLength, this->maxLength, this->maxSpeed, this->stiffness,
-        this->damping, this->maxTension, this->breakawayTension, this->brakeDamping};
+        this->damping, this->maxTension, this->breakawayTension, this->brakeDamping,
+        this->takeupTension, this->maxRetractSpeed};
     if (this->vehicleName.empty() || !this->anchorOffset.IsFinite() ||
         !this->vehicleOffset.IsFinite() ||
         !std::all_of(parameters.begin(), parameters.end(),
                      [](double value) { return std::isfinite(value); }) ||
         this->radius <= 0 || this->stiffness <= 0 || this->damping < 0 ||
         this->breakawayTension < 0 || this->brakeDamping < 0 ||
+        this->takeupTension < 0 || this->takeupTension > this->maxTension ||
+        this->maxRetractSpeed <= 0 ||
         this->maxSpeed <= 0 || this->maxTension <= 0 || this->minLength <= 0 ||
         this->minLength > this->initialLength ||
         this->initialLength > this->maxLength || this->minLength >= this->maxLength)
@@ -185,7 +190,8 @@ class TetherPlugin final : public System, public ISystemConfigure,
         this->reel.SetPositionLimits(ecm, {{
             (this->minLength - this->initialLength) / this->radius,
             (this->maxLength - this->initialLength) / this->radius}});
-      this->reel.SetVelocityLimits(ecm, {{mode == ReelMode::Length ? -maxRate : 0.0, maxRate}});
+      if (mode == ReelMode::Length)
+        this->reel.SetVelocityLimits(ecm, {{-maxRate, maxRate}});
 
       // Gazebo gives force commands precedence if both components exist.
       ecm.RemoveComponent<components::JointForceCmd>(this->reel.Entity());
@@ -202,13 +208,25 @@ class TetherPlugin final : public System, public ISystemConfigure,
       return;
     }
 
-    // Cable load turns the drum through the external wrench. At rest the
-    // brake balances that load up to its breakaway torque, without motoring.
+    // Automatic take-up preserves the initial loose length. Limit each step's
+    // inward travel so recovery also stops at that length after a manual move.
+    const double retractSpeed = this->takeupTension > 0
+        ? std::min(this->maxRetractSpeed,
+            std::max(0.0, (length - this->initialLength) / dt)) : 0.0;
+    this->reel.SetVelocityLimits(ecm, {{-retractSpeed / this->radius, maxRate}});
+    const double takeup = length > this->initialLength
+        ? this->radius * this->takeupTension : 0.0;
+
+    // The weak take-up torque winds slack line back onto the drum. Cable load
+    // balances it once taut. The breakaway brake resists outward motion only,
+    // while viscous damping opposes rotation in either direction.
     const double threshold = this->radius * this->breakawayTension;
     const double rate = std::max(0.0, angularRate);
-    double brake = rate > 1e-6
-        ? threshold + this->brakeDamping * rate
-        : std::min(threshold, drumLoad);
+    double brake = takeup + this->brakeDamping * angularRate;
+    if (angularRate > 1e-6)
+      brake += threshold;
+    else if (angularRate >= -1e-6)
+      brake = takeup + std::min(threshold, std::max(0.0, drumLoad - takeup));
     // Ramp in extra braking over the final 10% of the allowable speed.
     const double governor = Limit((rate / maxRate - 0.9) / 0.1, 0.0, 1.0);
     brake += governor * std::max(0.0, drumLoad - brake);
@@ -293,8 +311,9 @@ class TetherPlugin final : public System, public ISystemConfigure,
   private: double stiffness{}, damping{}, maxTension{};
   private: bool configured{false}, reportedMissing{false};
   private: double breakawayTension{}, brakeDamping{};
+  private: double takeupTension{}, maxRetractSpeed{};
   private: ReelMode reelMode{ReelMode::Unconfigured};
-  // A non-finite target leaves the winch in automatic braked payout.
+  // A non-finite target leaves the winch in automatic payout and slack take-up.
   private: std::atomic<double> targetLength{std::numeric_limits<double>::quiet_NaN()};
   private: std::chrono::steady_clock::duration lastPublication{};
   private: std::array<Publisher, 8> telemetry;
