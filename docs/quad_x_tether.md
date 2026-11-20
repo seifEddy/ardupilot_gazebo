@@ -10,6 +10,8 @@ ros2 launch robot_description copter_sim.launch.py world:=quad_x_tether mode:=gu
 
 The world loads the existing Quad X with its ArduPilot JSON SITL plugin and adds the tether station and `TetherPlugin`. The station sits 1.4 m to the side of the pad. The drum starts at the world's `initial_length`. Automatic payout is available when this value is below `max_length`. A GUI marker represents the cable in cyan when slack and orange under tension. Slack sag is a drawing approximation. The physical model is a massless, compliant line between two endpoints. Cable weight, aerodynamic drag, contact, entanglement, and failure are outside this model.
 
+For a station mounted on a keyboard-driven Prius, select `quad_x_tether_car`. The [mobile station guide](quad_x_tether_car.md) describes the roof mount, vehicle state, ROS teleoperation, and moving-anchor control setup.
+
 ## Station and joints
 
 - `anchor_joint` is a fixed joint from `world` to the station chassis. It reacts the cable load into the ground.
@@ -83,7 +85,7 @@ z = range × sin(elevation)
 
 The vector is expressed along Gazebo world ENU axes. `range` measures endpoint separation, while paid-out `length` also reflects drum motion, slack, and cable stretch. Elevation is the angle above the horizontal plane, so a vertical line has elevation π/2 and zero horizontal projection.
 
-The ROS demo uses this vector for proportional XYZ velocity control, with fixed zero X and Y targets and a runtime `target_altitude_z` parameter. It also publishes relative and translated position diagnostics. The Gazebo reel responds to cable load independently of the ROS controller. Launch, parameter, frame-comparison, and takeoff-sequencing details are in the parent workspace's [ROS 2 guide](../../../../../ros2_ws/README.md#run-the-tether-supervisor).
+The ROS demo uses this vector for proportional XYZ velocity control, with fixed zero X and Y targets and a runtime `target_altitude_z` parameter. It publishes the relative attachment vector on `/gz/tether/relative_position`. The Gazebo reel responds to cable load independently of the ROS controller. Launch, parameter, frame-comparison, and takeoff-sequencing details are in the parent workspace's [ROS 2 guide](../../../../../ros2_ws/README.md#run-the-tether-supervisor).
 
 ## Set line length and monitor tension
 
